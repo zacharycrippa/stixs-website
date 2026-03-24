@@ -27,8 +27,13 @@ export default function Header() {
           </Link>
         </nav>
         <div className="flex items-center space-x-4">
-          <Link href="/cart" className="hover:text-gray-300">
-            Cart ({getCartCount()})
+          <Link href="/cart" className="relative hover:text-gray-300 flex items-center gap-1">
+            Cart
+            {getCartCount() > 0 && (
+              <span className="bg-white text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {getCartCount()}
+              </span>
+            )}
           </Link>
         </div>
       </div>
