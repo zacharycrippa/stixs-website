@@ -1,4 +1,14 @@
-export default function Home() {
+import Link from 'next/link'
+import { prisma } from '@/lib/prisma'
+
+export const dynamic = 'force-dynamic'
+
+export default async function Home() {
+  const featuredProducts = await prisma.product.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 3
+  })
+
   return (
     <main className="bg-gray-100 min-h-screen">
 
@@ -17,34 +27,21 @@ export default function Home() {
           Featured Products
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Product 1 */}
-          <a href="/products/caravan-scoop" className="block">
-            <div className="bg-white p-4 rounded shadow hover:shadow-lg transition">
-              <div className="h-40 bg-gray-300 mb-4"></div>
-              <h3 className="text-xl font-semibold">Caravan Scoop</h3>
-              <p>$350</p>
-            </div>
-          </a>
-
-          {/* Product 2 */}
-          <a href="/products/giraffe-fidget-toy" className="block">
-            <div className="bg-white p-4 rounded shadow hover:shadow-lg transition">
-              <div className="h-40 bg-gray-300 mb-4"></div>
-              <h3 className="text-xl font-semibold">Giraffe Fidget Toy</h3>
-              <p>$9.99</p>
-            </div>
-          </a>
-
-          {/* Product 3 */}
-          <a href="/products/custom-print" className="block">
-            <div className="bg-white p-4 rounded shadow hover:shadow-lg transition">
-              <div className="h-40 bg-gray-300 mb-4"></div>
-              <h3 className="text-xl font-semibold">Custom Print</h3>
-              <p>From $10</p>
-            </div>
-          </a>
-        </div>
+        {featuredProducts.length === 0 ? (
+          <p className="text-center text-gray-600">No featured products yet.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {featuredProducts.map((product) => (
+              <Link key={product.id} href={`/products/${product.slug}`} className="block">
+                <div className="bg-white p-4 rounded shadow hover:shadow-lg transition">
+                  <div className="h-40 bg-gray-300 mb-4"></div>
+                  <h3 className="text-xl font-semibold">{product.title}</h3>
+                  <p>${Number(product.price).toFixed(2)}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* ABOUT SECTION */}
