@@ -76,6 +76,15 @@ async function main() {
   }
 
   console.log('Products seeded')
+
+  // Seed default settings (only if not already set)
+  await prisma.setting.upsert({
+    where: { key: 'checkoutEnabled' },
+    update: {},
+    create: { key: 'checkoutEnabled', value: 'false' }
+  })
+
+  console.log('Settings seeded')
 }
 
 main()

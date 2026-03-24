@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCart } from '../components/CartContext'
 
 export default function Cart() {
@@ -10,6 +10,13 @@ export default function Cart() {
   const [submitting, setSubmitting] = useState(false)
   const [orderPlaced, setOrderPlaced] = useState(false)
   const [error, setError] = useState('')
+  const [checkoutEnabled, setCheckoutEnabled] = useState(null)
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then(d => setCheckoutEnabled(d.checkoutEnabled))
+  }, [])
 
   const handleCheckout = async (e) => {
     e.preventDefault()
@@ -98,12 +105,16 @@ export default function Cart() {
             <div className="mt-8 flex justify-between items-center">
               <p className="text-2xl font-bold">Total: ${getTotal().toFixed(2)}</p>
               {!showCheckout && (
-                <button
-                  onClick={() => setShowCheckout(true)}
-                  className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800"
-                >
-                  Proceed to Checkout
-                </button>
+                checkoutEnabled === false ? (
+                  <p className="text-gray-500 italic">Checkout is currently unavailable. Check back soon!</p>
+                ) : checkoutEnabled === true ? (
+                  <button
+                    onClick={() => setShowCheckout(true)}
+                    className="bg-black text-white px-6 py-3 rounded hover:bg-gray-800"
+                  >
+                    Proceed to Checkout
+                  </button>
+                ) : null
               )}
             </div>
 
