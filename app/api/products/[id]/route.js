@@ -10,10 +10,18 @@ export async function GET(request, { params }) {
 }
 
 export async function PATCH(request, { params }) {
-  const { title, description, price, stock, image } = await request.json()
+  const { title, slug, description, price, stock, image, featured } = await request.json()
   const updated = await prisma.product.update({
     where: { id: params.id },
-    data: { title, description, price: price != null ? Number(price) : undefined, stock: stock != null ? Number(stock) : undefined, image }
+    data: {
+      title,
+      slug,
+      description,
+      price: price != null ? Number(price) : undefined,
+      stock: stock != null ? Number(stock) : undefined,
+      image,
+      featured: featured != null ? Boolean(featured) : undefined
+    }
   })
   return NextResponse.json(updated)
 }

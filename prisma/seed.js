@@ -28,7 +28,8 @@ async function main() {
       description: 'A fun and functional scoop for your caravan adventures.',
       price: 25.00,
       stock: 10,
-      image: '/caravan-scoop.jpg'
+      image: '/caravan-scoop.jpg',
+      featured: true
     },
     {
       title: 'Custom Print',
@@ -36,7 +37,8 @@ async function main() {
       description: 'Personalized 3D printed items tailored to your design.',
       price: 50.00,
       stock: 5,
-      image: '/custom-print.jpg'
+      image: '/custom-print.jpg',
+      featured: true
     },
     {
       title: 'Giraffe Fidget Toy',
@@ -44,7 +46,8 @@ async function main() {
       description: 'A cute giraffe-shaped fidget toy for stress relief.',
       price: 15.00,
       stock: 20,
-      image: '/giraffe-fidget-toy.jpg'
+      image: '/giraffe-fidget-toy.jpg',
+      featured: true
     },
     {
       title: 'Phone Stand',
@@ -52,14 +55,22 @@ async function main() {
       description: 'Adjustable 3D printed phone stand for desk or car.',
       price: 20.00,
       stock: 15,
-      image: '/phone-stand.jpg'
+      image: '/phone-stand.jpg',
+      featured: false
     }
   ]
 
   for (const product of products) {
     await prisma.product.upsert({
       where: { slug: product.slug },
-      update: {},
+      update: {
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        stock: product.stock,
+        image: product.image,
+        featured: product.featured
+      },
       create: product
     })
   }

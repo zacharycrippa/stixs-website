@@ -8,7 +8,9 @@ export default function AdminProducts() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [products, setProducts] = useState([])
-  const [newProduct, setNewProduct] = useState({ title: '', slug: '', description: '', price: '', stock: '', image: '' })
+  const [newProduct, setNewProduct] = useState({ title: '', slug: '', description: '', price: '', stock: '', image: '', featured: false })
+  const [editingId, setEditingId] = useState(null)
+  const [editingProduct, setEditingProduct] = useState({ title: '', slug: '', description: '', price: '', stock: '', image: '', featured: false })
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -40,14 +42,55 @@ export default function AdminProducts() {
       body: JSON.stringify({
         ...newProduct,
         price: Number(newProduct.price),
-        stock: Number(newProduct.stock)
+        stock: Number(newProduct.stock),
+        featured: Boolean(newProduct.featured)
       })
     })
     if (!res.ok) {
       setError('Failed to create product')
       return
     }
-    setNewProduct({ title: '', slug: '', description: '', price: '', stock: '', image: '' })
+    setNewProduct({ title: '', slug: '', description: '', price: '', stock: '', image: '', featured: false })
+    await refresh()
+  }
+
+  const startEdit = (item) => {
+    setEditingId(item.id)
+    setEditingProduct({
+      title: item.title,
+      slug: item.slug,
+      description: item.description,
+      price: String(item.price),
+      stock: String(item.stock),
+      image: item.image || '',
+      featured: Boolean(item.featured)
+    })
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditingProduct({ title: '', slug: '', description: '', price: '', stock: '', image: '', featured: false })
+  }
+
+  const saveEdit = async (id) => {
+    setError('')
+    const res = await fetch(`/api/products/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...editingProduct,
+        price: Number(editingProduct.price),
+        stock: Number(editingProduct.stock),
+        featured: Boolean(editingProduct.featured)
+      })
+    })
+
+    if (!res.ok) {
+      setError('Failed to update product')
+      return
+    }
+
+    cancelEdit()
     await refresh()
   }
 
@@ -70,6 +113,14 @@ export default function AdminProducts() {
             <input value={newProduct.stock} onChange={(e) => setNewProduct((p) => ({ ...p, stock: e.target.value }))} placeholder="Stock" type="number" className="p-2 border rounded" required />
             <input value={newProduct.image} onChange={(e) => setNewProduct((p) => ({ ...p, image: e.target.value }))} placeholder="Image URL" className="p-2 border rounded" />
             <textarea value={newProduct.description} onChange={(e) => setNewProduct((p) => ({ ...p, description: e.target.value }))} placeholder="Description" className="p-2 border rounded col-span-1 md:col-span-2" required />
+            <label className="flex items-center gap-2 col-span-1 md:col-span-2">
+              <input
+                type="checkbox"
+                checked={newProduct.featured}
+                onChange={(e) => setNewProduct((p) => ({ ...p, featured: e.target.checked }))}
+              />
+              Featured product
+            </label>
           </div>
           {error && <p className="text-red-500 mt-2">{error}</p>}
           <button className="mt-4 bg-black text-white px-4 py-2 rounded">Save</button>
@@ -79,12 +130,42 @@ export default function AdminProducts() {
           <h2 className="text-xl mb-4">Product List</h2>
           <div className="grid gap-4">
             {products.map((item) => (
-              <div key={item.id} className="p-4 border rounded flex justify-between items-center">
-                <div>
-                  <p className="font-semibold">{item.title}</p>
-                  <p className="text-sm text-gray-600">${item.price} | Stock: {item.stock}</p>
-                </div>
-                <button onClick={() => deleteProduct(item.id)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+              <div key={item.id} className="p-4 border rounded">
+                {editingId === item.id ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input value={editingProduct.title} onChange={(e) => setEditingProduct((p) => ({ ...p, title: e.target.value }))} className="p-2 border rounded" placeholder="Title" />
+                    <input value={editingProduct.slug} onChange={(e) => setEditingProduct((p) => ({ ...p, slug: e.target.value }))} className="p-2 border rounded" placeholder="Slug" />
+                    <input value={editingProduct.price} onChange={(e) => setEditingProduct((p) => ({ ...p, price: e.target.value }))} className="p-2 border rounded" type="number" step="0.01" placeholder="Price" />
+                    <input value={editingProduct.stock} onChange={(e) => setEditingProduct((p) => ({ ...p, stock: e.target.value }))} className="p-2 border rounded" type="number" placeholder="Stock" />
+                    <input value={editingProduct.image} onChange={(e) => setEditingProduct((p) => ({ ...p, image: e.target.value }))} className="p-2 border rounded" placeholder="Image URL" />
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={editingProduct.featured}
+                        onChange={(e) => setEditingProduct((p) => ({ ...p, featured: e.target.checked }))}
+                      />
+                      Featured product
+                    </label>
+                    <textarea value={editingProduct.description} onChange={(e) => setEditingProduct((p) => ({ ...p, description: e.target.value }))} className="p-2 border rounded col-span-1 md:col-span-2" placeholder="Description" />
+                    <div className="col-span-1 md:col-span-2 flex gap-2">
+                      <button onClick={() => saveEdit(item.id)} className="bg-black text-white px-3 py-1 rounded">Save Changes</button>
+                      <button onClick={cancelEdit} className="bg-gray-400 text-white px-3 py-1 rounded">Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-semibold">
+                        {item.title} {item.featured ? <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Featured</span> : null}
+                      </p>
+                      <p className="text-sm text-gray-600">${item.price} | Stock: {item.stock}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => startEdit(item)} className="bg-blue-500 text-white px-3 py-1 rounded">Edit</button>
+                      <button onClick={() => deleteProduct(item.id)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

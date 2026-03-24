@@ -9,7 +9,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  const { title, slug, description, price, stock, image } = await request.json()
+  const { title, slug, description, price, stock, image, featured } = await request.json()
 
   if (!title || !slug || !description || price == null || stock == null) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
@@ -22,7 +22,8 @@ export async function POST(request) {
       description,
       price: Number(price),
       stock: Number(stock),
-      image: image || ''
+      image: image || '',
+      featured: Boolean(featured)
     }
   })
 
