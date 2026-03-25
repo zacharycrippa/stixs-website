@@ -39,10 +39,10 @@ export default async function Home() {
                     <img
                       src={product.image}
                       alt={product.title}
-                      className="w-full h-96 object-cover rounded mb-4"
+                      className="w-full h-[42rem] object-cover rounded mb-4"
                     />
                   ) : (
-                    <div className="w-full h-96 bg-gray-300 rounded mb-4 flex items-center justify-center">
+                    <div className="w-full h-[42rem] bg-gray-300 rounded mb-4 flex items-center justify-center">
                       <span className="text-gray-500 text-sm">No image</span>
                     </div>
                   )}

@@ -15,7 +15,7 @@ export default async function ProductDetailPage({ params }) {
     <main className="min-h-screen bg-gray-100 p-10">
       <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow">
         {product.image && (
-          <img src={product.image} alt={product.title} className="w-full h-96 object-cover rounded mb-6" />
+          <img src={product.image} alt={product.title} className="w-full h-[42rem] object-cover rounded mb-6" />
         )}
         <h1 className="text-4xl font-bold mb-4">{product.title}</h1>
         <p className="text-gray-700 mb-6">{product.description}</p>

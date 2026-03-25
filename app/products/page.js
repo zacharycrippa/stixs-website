@@ -39,9 +39,9 @@ export default function ProductsPage() {
             {products.map((product) => (
               <div key={product.id} className="bg-white rounded-lg shadow overflow-hidden">
                 {product.image ? (
-                  <img src={product.image} alt={product.title} className="w-full h-96 object-cover" />
+                  <img src={product.image} alt={product.title} className="w-full h-[42rem] object-cover" />
                 ) : (
-                  <div className="w-full h-96 bg-gray-200 flex items-center justify-center">
+                  <div className="w-full h-[42rem] bg-gray-200 flex items-center justify-center">
                     <span className="text-gray-400 text-sm">No image</span>
                   </div>
                 )}
