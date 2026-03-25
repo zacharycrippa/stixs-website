@@ -99,6 +99,17 @@ export default function AdminProducts() {
     await refresh()
   }
 
+  const uploadImage = async (file, updateFn) => {
+    const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+      method: 'POST',
+      body: file,
+    })
+    if (res.ok) {
+      const data = await res.json()
+      updateFn(data.url)
+    }
+  }
+
   return (
     <main className="bg-gray-100 min-h-screen p-10">
       <div className="max-w-6xl mx-auto">
@@ -111,7 +122,24 @@ export default function AdminProducts() {
             <input value={newProduct.slug} onChange={(e) => setNewProduct((p) => ({ ...p, slug: e.target.value }))} placeholder="Slug" className="p-2 border rounded" required />
             <input value={newProduct.price} onChange={(e) => setNewProduct((p) => ({ ...p, price: e.target.value }))} placeholder="Price" type="number" step="0.01" className="p-2 border rounded" required />
             <input value={newProduct.stock} onChange={(e) => setNewProduct((p) => ({ ...p, stock: e.target.value }))} placeholder="Stock" type="number" className="p-2 border rounded" required />
-            <input value={newProduct.image} onChange={(e) => setNewProduct((p) => ({ ...p, image: e.target.value }))} placeholder="Image URL" className="p-2 border rounded" />
+            <div className="col-span-1 md:col-span-2">
+              <label className="block text-sm text-gray-500 mb-1">Product Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => e.target.files[0] && uploadImage(e.target.files[0], (url) => setNewProduct((p) => ({ ...p, image: url })))}
+                className="block mb-2 text-sm"
+              />
+              <input
+                value={newProduct.image}
+                onChange={(e) => setNewProduct((p) => ({ ...p, image: e.target.value }))}
+                placeholder="Or paste image URL"
+                className="p-2 border rounded w-full text-sm"
+              />
+              {newProduct.image && (
+                <img src={newProduct.image} alt="Preview" className="mt-2 h-28 w-28 object-cover rounded border" />
+              )}
+            </div>
             <textarea value={newProduct.description} onChange={(e) => setNewProduct((p) => ({ ...p, description: e.target.value }))} placeholder="Description" className="p-2 border rounded col-span-1 md:col-span-2" required />
             <label className="flex items-center gap-2 col-span-1 md:col-span-2">
               <input
@@ -137,7 +165,24 @@ export default function AdminProducts() {
                     <input value={editingProduct.slug} onChange={(e) => setEditingProduct((p) => ({ ...p, slug: e.target.value }))} className="p-2 border rounded" placeholder="Slug" />
                     <input value={editingProduct.price} onChange={(e) => setEditingProduct((p) => ({ ...p, price: e.target.value }))} className="p-2 border rounded" type="number" step="0.01" placeholder="Price" />
                     <input value={editingProduct.stock} onChange={(e) => setEditingProduct((p) => ({ ...p, stock: e.target.value }))} className="p-2 border rounded" type="number" placeholder="Stock" />
-                    <input value={editingProduct.image} onChange={(e) => setEditingProduct((p) => ({ ...p, image: e.target.value }))} className="p-2 border rounded" placeholder="Image URL" />
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-sm text-gray-500 mb-1">Product Image</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => e.target.files[0] && uploadImage(e.target.files[0], (url) => setEditingProduct((p) => ({ ...p, image: url })))}
+                        className="block mb-2 text-sm"
+                      />
+                      <input
+                        value={editingProduct.image}
+                        onChange={(e) => setEditingProduct((p) => ({ ...p, image: e.target.value }))}
+                        placeholder="Or paste image URL"
+                        className="p-2 border rounded w-full text-sm"
+                      />
+                      {editingProduct.image && (
+                        <img src={editingProduct.image} alt="Preview" className="mt-2 h-28 w-28 object-cover rounded border" />
+                      )}
+                    </div>
                     <label className="flex items-center gap-2">
                       <input
                         type="checkbox"
@@ -154,11 +199,20 @@ export default function AdminProducts() {
                   </div>
                 ) : (
                   <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-semibold">
-                        {item.title} {item.featured ? <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Featured</span> : null}
-                      </p>
-                      <p className="text-sm text-gray-600">${item.price} | Stock: {item.stock}</p>
+                    <div className="flex items-center gap-4">
+                      {item.image ? (
+                        <img src={item.image} alt={item.title} className="h-16 w-16 object-cover rounded border flex-shrink-0" />
+                      ) : (
+                        <div className="h-16 w-16 bg-gray-200 rounded border flex items-center justify-center flex-shrink-0">
+                          <span className="text-xs text-gray-400">No image</span>
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-semibold">
+                          {item.title} {item.featured ? <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Featured</span> : null}
+                        </p>
+                        <p className="text-sm text-gray-600">${item.price} | Stock: {item.stock}</p>
+                      </div>
                     </div>
                     <div className="flex gap-2">
                       <button onClick={() => startEdit(item)} className="bg-blue-500 text-white px-3 py-1 rounded">Edit</button>

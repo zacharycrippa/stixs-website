@@ -37,7 +37,15 @@ export default function ProductsPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
-              <div key={product.id} className="bg-white rounded-lg shadow p-5">
+              <div key={product.id} className="bg-white rounded-lg shadow overflow-hidden">
+                {product.image ? (
+                  <img src={product.image} alt={product.title} className="w-full h-48 object-cover" />
+                ) : (
+                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400 text-sm">No image</span>
+                  </div>
+                )}
+                <div className="p-5">
                 <h2 className="text-2xl font-semibold mb-2">{product.title}</h2>
                 <p className="text-gray-600 mb-3">{product.description}</p>
                 <p className="font-bold mb-4">${Number(product.price).toFixed(2)}</p>
@@ -54,6 +62,7 @@ export default function ProductsPage() {
                   >
                     Add to Cart
                   </button>
+                </div>
                 </div>
               </div>
             ))}
