@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(request) {
   const { name, email, subject, message } = await request.json()
 
@@ -18,6 +16,8 @@ export async function POST(request) {
   // Send notification email to admin if key is configured
   if (process.env.RESEND_API_KEY && process.env.ADMIN_NOTIFY_EMAIL) {
     try {
+      const resend = new Resend(process.env.RESEND_API_KEY)
+
       await resend.emails.send({
         from: 'Stixs 3D <notifications@resend.dev>',
         to: process.env.ADMIN_NOTIFY_EMAIL,
