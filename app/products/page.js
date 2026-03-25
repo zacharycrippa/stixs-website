@@ -39,7 +39,18 @@ export default function ProductsPage() {
             {products.map((product) => (
               <div key={product.id} className="bg-white rounded-lg shadow overflow-hidden">
                 {product.image ? (
-                  <img src={product.image} alt={product.title} className="w-full h-[42rem] object-cover" />
+                  <div className="w-full h-[42rem] overflow-hidden">
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="w-full h-full object-cover"
+                      style={{
+                        objectPosition: `center ${product.imagePositionY ?? 50}%`,
+                        transform: `scale(${(product.imageScale ?? 100) / 100})`,
+                        transformOrigin: 'center',
+                      }}
+                    />
+                  </div>
                 ) : (
                   <div className="w-full h-[42rem] bg-gray-200 flex items-center justify-center">
                     <span className="text-gray-400 text-sm">No image</span>

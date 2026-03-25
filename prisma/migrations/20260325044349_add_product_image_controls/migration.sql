@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Product" ADD COLUMN     "imagePositionY" INTEGER NOT NULL DEFAULT 50,
+ADD COLUMN     "imageScale" INTEGER NOT NULL DEFAULT 100;

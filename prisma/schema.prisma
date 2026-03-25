@@ -63,6 +63,8 @@ model Product {
   price       Float
   stock       Int      @default(0)
   image       String?
+  imageScale  Int      @default(100)
+  imagePositionY Int   @default(50)
   featured    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

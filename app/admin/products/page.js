@@ -8,9 +8,9 @@ export default function AdminProducts() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [products, setProducts] = useState([])
-  const [newProduct, setNewProduct] = useState({ title: '', slug: '', description: '', price: '', stock: '', image: '', featured: false })
+  const [newProduct, setNewProduct] = useState({ title: '', slug: '', description: '', price: '', stock: '', image: '', imageScale: 100, imagePositionY: 50, featured: false })
   const [editingId, setEditingId] = useState(null)
-  const [editingProduct, setEditingProduct] = useState({ title: '', slug: '', description: '', price: '', stock: '', image: '', featured: false })
+  const [editingProduct, setEditingProduct] = useState({ title: '', slug: '', description: '', price: '', stock: '', image: '', imageScale: 100, imagePositionY: 50, featured: false })
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -43,6 +43,8 @@ export default function AdminProducts() {
         ...newProduct,
         price: Number(newProduct.price),
         stock: Number(newProduct.stock),
+        imageScale: Number(newProduct.imageScale),
+        imagePositionY: Number(newProduct.imagePositionY),
         featured: Boolean(newProduct.featured)
       })
     })
@@ -50,7 +52,7 @@ export default function AdminProducts() {
       setError('Failed to create product')
       return
     }
-    setNewProduct({ title: '', slug: '', description: '', price: '', stock: '', image: '', featured: false })
+    setNewProduct({ title: '', slug: '', description: '', price: '', stock: '', image: '', imageScale: 100, imagePositionY: 50, featured: false })
     await refresh()
   }
 
@@ -63,13 +65,15 @@ export default function AdminProducts() {
       price: String(item.price),
       stock: String(item.stock),
       image: item.image || '',
+      imageScale: item.imageScale ?? 100,
+      imagePositionY: item.imagePositionY ?? 50,
       featured: Boolean(item.featured)
     })
   }
 
   const cancelEdit = () => {
     setEditingId(null)
-    setEditingProduct({ title: '', slug: '', description: '', price: '', stock: '', image: '', featured: false })
+    setEditingProduct({ title: '', slug: '', description: '', price: '', stock: '', image: '', imageScale: 100, imagePositionY: 50, featured: false })
   }
 
   const saveEdit = async (id) => {
@@ -81,6 +85,8 @@ export default function AdminProducts() {
         ...editingProduct,
         price: Number(editingProduct.price),
         stock: Number(editingProduct.stock),
+        imageScale: Number(editingProduct.imageScale),
+        imagePositionY: Number(editingProduct.imagePositionY),
         featured: Boolean(editingProduct.featured)
       })
     })
@@ -126,6 +132,12 @@ export default function AdminProducts() {
     updateFn(data.url)
   }
 
+  const getImagePreviewStyle = (product) => ({
+    objectPosition: `center ${product.imagePositionY ?? 50}%`,
+    transform: `scale(${(product.imageScale ?? 100) / 100})`,
+    transformOrigin: 'center',
+  })
+
   return (
     <main className="bg-gray-100 min-h-screen p-10">
       <div className="max-w-6xl mx-auto">
@@ -153,8 +165,43 @@ export default function AdminProducts() {
                 className="p-2 border rounded w-full text-sm"
               />
               {newProduct.image && (
-                <img src={newProduct.image} alt="Preview" className="mt-2 h-28 w-28 object-cover rounded border" />
+                <div className="mt-3">
+                  <div className="h-80 w-56 overflow-hidden rounded border bg-gray-100">
+                    <img
+                      src={newProduct.image}
+                      alt="Preview"
+                      className="h-full w-full object-cover"
+                      style={getImagePreviewStyle(newProduct)}
+                    />
+                  </div>
+                </div>
               )}
+              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label className="text-sm text-gray-600">
+                  Zoom: {newProduct.imageScale}%
+                  <input
+                    type="range"
+                    min="100"
+                    max="250"
+                    step="5"
+                    value={newProduct.imageScale}
+                    onChange={(e) => setNewProduct((p) => ({ ...p, imageScale: Number(e.target.value) }))}
+                    className="mt-1 w-full"
+                  />
+                </label>
+                <label className="text-sm text-gray-600">
+                  Vertical position: {newProduct.imagePositionY}%
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={newProduct.imagePositionY}
+                    onChange={(e) => setNewProduct((p) => ({ ...p, imagePositionY: Number(e.target.value) }))}
+                    className="mt-1 w-full"
+                  />
+                </label>
+              </div>
             </div>
             <textarea value={newProduct.description} onChange={(e) => setNewProduct((p) => ({ ...p, description: e.target.value }))} placeholder="Description" className="p-2 border rounded col-span-1 md:col-span-2" required />
             <label className="flex items-center gap-2 col-span-1 md:col-span-2">
@@ -196,8 +243,43 @@ export default function AdminProducts() {
                         className="p-2 border rounded w-full text-sm"
                       />
                       {editingProduct.image && (
-                        <img src={editingProduct.image} alt="Preview" className="mt-2 h-28 w-28 object-cover rounded border" />
+                        <div className="mt-3">
+                          <div className="h-80 w-56 overflow-hidden rounded border bg-gray-100">
+                            <img
+                              src={editingProduct.image}
+                              alt="Preview"
+                              className="h-full w-full object-cover"
+                              style={getImagePreviewStyle(editingProduct)}
+                            />
+                          </div>
+                        </div>
                       )}
+                      <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <label className="text-sm text-gray-600">
+                          Zoom: {editingProduct.imageScale}%
+                          <input
+                            type="range"
+                            min="100"
+                            max="250"
+                            step="5"
+                            value={editingProduct.imageScale}
+                            onChange={(e) => setEditingProduct((p) => ({ ...p, imageScale: Number(e.target.value) }))}
+                            className="mt-1 w-full"
+                          />
+                        </label>
+                        <label className="text-sm text-gray-600">
+                          Vertical position: {editingProduct.imagePositionY}%
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            step="1"
+                            value={editingProduct.imagePositionY}
+                            onChange={(e) => setEditingProduct((p) => ({ ...p, imagePositionY: Number(e.target.value) }))}
+                            className="mt-1 w-full"
+                          />
+                        </label>
+                      </div>
                     </div>
                     <label className="flex items-center gap-2">
                       <input
@@ -217,7 +299,14 @@ export default function AdminProducts() {
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-4">
                       {item.image ? (
-                        <img src={item.image} alt={item.title} className="h-16 w-16 object-cover rounded border flex-shrink-0" />
+                        <div className="h-16 w-16 overflow-hidden rounded border flex-shrink-0 bg-gray-100">
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="h-full w-full object-cover"
+                            style={getImagePreviewStyle(item)}
+                          />
+                        </div>
                       ) : (
                         <div className="h-16 w-16 bg-gray-200 rounded border flex items-center justify-center flex-shrink-0">
                           <span className="text-xs text-gray-400">No image</span>

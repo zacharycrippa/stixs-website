@@ -36,11 +36,18 @@ export default async function Home() {
               <Link key={product.id} href={`/products/${product.slug}`} className="block">
                 <div className="bg-white p-4 rounded shadow hover:shadow-lg transition">
                   {product.image ? (
-                    <img
-                      src={product.image}
-                      alt={product.title}
-                      className="w-full h-[42rem] object-cover rounded mb-4"
-                    />
+                    <div className="w-full h-[42rem] overflow-hidden rounded mb-4">
+                      <img
+                        src={product.image}
+                        alt={product.title}
+                        className="w-full h-full object-cover"
+                        style={{
+                          objectPosition: `center ${product.imagePositionY ?? 50}%`,
+                          transform: `scale(${(product.imageScale ?? 100) / 100})`,
+                          transformOrigin: 'center',
+                        }}
+                      />
+                    </div>
                   ) : (
                     <div className="w-full h-[42rem] bg-gray-300 rounded mb-4 flex items-center justify-center">
                       <span className="text-gray-500 text-sm">No image</span>
