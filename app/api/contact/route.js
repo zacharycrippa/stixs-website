@@ -18,7 +18,7 @@ export async function POST(request) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY)
 
-      await resend.emails.send({
+      const sendResult = await resend.emails.send({
         from: 'Stixs 3D <notifications@resend.dev>',
         to: process.env.ADMIN_NOTIFY_EMAIL,
         subject: `New enquiry: ${subject}`,
@@ -32,10 +32,16 @@ export async function POST(request) {
           <p><a href="${process.env.NEXTAUTH_URL}/admin/enquiries">View in admin</a></p>
         `
       })
+
+      if (sendResult?.error) {
+        console.error('Resend reported an email send error:', sendResult.error)
+      }
     } catch (emailError) {
       // Log but don't fail the request if email sending fails
       console.error('Failed to send notification email:', emailError)
     }
+  } else {
+    console.warn('Email notification skipped: RESEND_API_KEY or ADMIN_NOTIFY_EMAIL is missing')
   }
 
   return NextResponse.json({ success: true, id: enquiry.id }, { status: 201 })
