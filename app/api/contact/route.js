@@ -4,6 +4,7 @@ import { Resend } from 'resend'
 
 export async function POST(request) {
   const { name, email, subject, message } = await request.json()
+  const fromEmail = process.env.RESEND_FROM || 'Stixs 3D <notifications@resend.dev>'
 
   if (!name || !email || !subject || !message) {
     return NextResponse.json({ error: 'All fields are required.' }, { status: 400 })
@@ -19,7 +20,7 @@ export async function POST(request) {
       const resend = new Resend(process.env.RESEND_API_KEY)
 
       const sendResult = await resend.emails.send({
-        from: 'Stixs 3D <notifications@resend.dev>',
+        from: fromEmail,
         to: process.env.ADMIN_NOTIFY_EMAIL,
         subject: `New enquiry: ${subject}`,
         html: `

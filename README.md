@@ -52,6 +52,9 @@ Prisma is configured for PostgreSQL. Use a managed Postgres DB for production.
 - `NEXTAUTH_SECRET` = long random secret
 - `ADMIN_EMAIL` = initial admin email
 - `ADMIN_PASSWORD` = initial admin password
+- `RESEND_API_KEY` = your Resend API key (for enquiry notifications)
+- `ADMIN_NOTIFY_EMAIL` = where enquiry alert emails should go
+- `RESEND_FROM` = verified sender address, e.g. `Stixs 3D <notifications@stixs3d.com>`
 
 3. For first migration from your local schema, create migration files locally:
 ```bash
