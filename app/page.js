@@ -35,7 +35,17 @@ export default async function Home() {
             {featuredProducts.map((product) => (
               <Link key={product.id} href={`/products/${product.slug}`} className="block">
                 <div className="bg-white p-4 rounded shadow hover:shadow-lg transition">
-                  <div className="h-40 bg-gray-300 mb-4"></div>
+                  {product.image ? (
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="w-full h-72 object-cover rounded mb-4"
+                    />
+                  ) : (
+                    <div className="w-full h-72 bg-gray-300 rounded mb-4 flex items-center justify-center">
+                      <span className="text-gray-500 text-sm">No image</span>
+                    </div>
+                  )}
                   <h3 className="text-xl font-semibold">{product.title}</h3>
                   <p>${Number(product.price).toFixed(2)}</p>
                 </div>
