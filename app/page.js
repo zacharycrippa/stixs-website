@@ -60,9 +60,9 @@ export default async function Home() {
           Have a custom idea?
         </h2>
         <p className="mb-6">Let’s bring it to life</p>
-        <button className="bg-white text-black px-6 py-2 rounded">
+        <Link href="/contact" className="bg-white text-black px-6 py-2 rounded inline-block">
           Contact Us
-        </button>
+        </Link>
       </section>
 
     </main>
