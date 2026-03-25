@@ -40,7 +40,7 @@ export default function Footer() {
           <div className="flex gap-4 mt-4">
             {/* Placeholder social links — replace hrefs with real URLs */}
             <a
-              href="https://instagram.com"
+              href="https://instagram.com/stixs_3d"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
@@ -51,7 +51,7 @@ export default function Footer() {
               </svg>
             </a>
             <a
-              href="https://facebook.com"
+              href="https://facebook.com/Stixs3D"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
