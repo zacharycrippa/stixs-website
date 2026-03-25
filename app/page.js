@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
+import { PRODUCT_IMAGE_FRAME_CLASS, PRODUCT_IMAGE_PLACEHOLDER_CLASS, getProductImageStyle } from '@/lib/productImage'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,20 +37,16 @@ export default async function Home() {
               <Link key={product.id} href={`/products/${product.slug}`} className="block">
                 <div className="bg-white p-4 rounded shadow hover:shadow-lg transition">
                   {product.image ? (
-                    <div className="w-full h-[42rem] overflow-hidden rounded mb-4">
+                    <div className={`${PRODUCT_IMAGE_FRAME_CLASS} rounded mb-4`}>
                       <img
                         src={product.image}
                         alt={product.title}
                         className="w-full h-full object-cover"
-                        style={{
-                          objectPosition: `center ${product.imagePositionY ?? 50}%`,
-                          transform: `scale(${(product.imageScale ?? 100) / 100})`,
-                          transformOrigin: 'center',
-                        }}
+                        style={getProductImageStyle(product)}
                       />
                     </div>
                   ) : (
-                    <div className="w-full h-[42rem] bg-gray-300 rounded mb-4 flex items-center justify-center">
+                    <div className={`${PRODUCT_IMAGE_PLACEHOLDER_CLASS} bg-gray-300 rounded mb-4`}>
                       <span className="text-gray-500 text-sm">No image</span>
                     </div>
                   )}

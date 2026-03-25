@@ -64,6 +64,7 @@ model Product {
   stock       Int      @default(0)
   image       String?
   imageScale  Int      @default(100)
+  imagePositionX Int   @default(50)
   imagePositionY Int   @default(50)
   featured    Boolean  @default(false)
   createdAt   DateTime @default(now())

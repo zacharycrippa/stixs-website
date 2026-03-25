@@ -10,7 +10,7 @@ export async function GET(request, { params }) {
 }
 
 export async function PATCH(request, { params }) {
-  const { title, slug, description, price, stock, image, imageScale, imagePositionY, featured } = await request.json()
+  const { title, slug, description, price, stock, image, imageScale, imagePositionX, imagePositionY, featured } = await request.json()
   const updated = await prisma.product.update({
     where: { id: params.id },
     data: {
@@ -21,6 +21,7 @@ export async function PATCH(request, { params }) {
       stock: stock != null ? Number(stock) : undefined,
       image,
       imageScale: imageScale != null ? Number(imageScale) : undefined,
+      imagePositionX: imagePositionX != null ? Number(imagePositionX) : undefined,
       imagePositionY: imagePositionY != null ? Number(imagePositionY) : undefined,
       featured: featured != null ? Boolean(featured) : undefined
     }

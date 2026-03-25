@@ -3,14 +3,28 @@
 import { useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { PRODUCT_IMAGE_PREVIEW_FRAME_CLASS, getProductImageStyle } from '@/lib/productImage'
+
+const defaultProductState = {
+  title: '',
+  slug: '',
+  description: '',
+  price: '',
+  stock: '',
+  image: '',
+  imageScale: 100,
+  imagePositionX: 50,
+  imagePositionY: 50,
+  featured: false,
+}
 
 export default function AdminProducts() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [products, setProducts] = useState([])
-  const [newProduct, setNewProduct] = useState({ title: '', slug: '', description: '', price: '', stock: '', image: '', imageScale: 100, imagePositionY: 50, featured: false })
+  const [newProduct, setNewProduct] = useState(defaultProductState)
   const [editingId, setEditingId] = useState(null)
-  const [editingProduct, setEditingProduct] = useState({ title: '', slug: '', description: '', price: '', stock: '', image: '', imageScale: 100, imagePositionY: 50, featured: false })
+  const [editingProduct, setEditingProduct] = useState(defaultProductState)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -22,6 +36,7 @@ export default function AdminProducts() {
       const res = await fetch('/api/products')
       setProducts(await res.json())
     }
+
     load()
   }, [])
 
@@ -33,9 +48,19 @@ export default function AdminProducts() {
     setProducts(await res.json())
   }
 
+  const resetImageControls = (updateFn) => {
+    updateFn((product) => ({
+      ...product,
+      imageScale: 100,
+      imagePositionX: 50,
+      imagePositionY: 50,
+    }))
+  }
+
   const createProduct = async (e) => {
     e.preventDefault()
     setError('')
+
     const res = await fetch('/api/products', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -44,15 +69,18 @@ export default function AdminProducts() {
         price: Number(newProduct.price),
         stock: Number(newProduct.stock),
         imageScale: Number(newProduct.imageScale),
+        imagePositionX: Number(newProduct.imagePositionX),
         imagePositionY: Number(newProduct.imagePositionY),
-        featured: Boolean(newProduct.featured)
-      })
+        featured: Boolean(newProduct.featured),
+      }),
     })
+
     if (!res.ok) {
       setError('Failed to create product')
       return
     }
-    setNewProduct({ title: '', slug: '', description: '', price: '', stock: '', image: '', imageScale: 100, imagePositionY: 50, featured: false })
+
+    setNewProduct(defaultProductState)
     await refresh()
   }
 
@@ -66,18 +94,20 @@ export default function AdminProducts() {
       stock: String(item.stock),
       image: item.image || '',
       imageScale: item.imageScale ?? 100,
+      imagePositionX: item.imagePositionX ?? 50,
       imagePositionY: item.imagePositionY ?? 50,
-      featured: Boolean(item.featured)
+      featured: Boolean(item.featured),
     })
   }
 
   const cancelEdit = () => {
     setEditingId(null)
-    setEditingProduct({ title: '', slug: '', description: '', price: '', stock: '', image: '', imageScale: 100, imagePositionY: 50, featured: false })
+    setEditingProduct(defaultProductState)
   }
 
   const saveEdit = async (id) => {
     setError('')
+
     const res = await fetch(`/api/products/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -86,9 +116,10 @@ export default function AdminProducts() {
         price: Number(editingProduct.price),
         stock: Number(editingProduct.stock),
         imageScale: Number(editingProduct.imageScale),
+        imagePositionX: Number(editingProduct.imagePositionX),
         imagePositionY: Number(editingProduct.imagePositionY),
-        featured: Boolean(editingProduct.featured)
-      })
+        featured: Boolean(editingProduct.featured),
+      }),
     })
 
     if (!res.ok) {
@@ -122,7 +153,6 @@ export default function AdminProducts() {
         const data = await res.json()
         if (data?.error) message = data.error
       } catch {
-        // Ignore JSON parse errors and show generic message.
       }
       setError(message)
       return
@@ -131,12 +161,6 @@ export default function AdminProducts() {
     const data = await res.json()
     updateFn(data.url)
   }
-
-  const getImagePreviewStyle = (product) => ({
-    objectPosition: `center ${product.imagePositionY ?? 50}%`,
-    transform: `scale(${(product.imageScale ?? 100) / 100})`,
-    transformOrigin: 'center',
-  })
 
   return (
     <main className="bg-gray-100 min-h-screen p-10">
@@ -150,6 +174,7 @@ export default function AdminProducts() {
             <input value={newProduct.slug} onChange={(e) => setNewProduct((p) => ({ ...p, slug: e.target.value }))} placeholder="Slug" className="p-2 border rounded" required />
             <input value={newProduct.price} onChange={(e) => setNewProduct((p) => ({ ...p, price: e.target.value }))} placeholder="Price" type="number" step="0.01" className="p-2 border rounded" required />
             <input value={newProduct.stock} onChange={(e) => setNewProduct((p) => ({ ...p, stock: e.target.value }))} placeholder="Stock" type="number" className="p-2 border rounded" required />
+
             <div className="col-span-1 md:col-span-2">
               <label className="block text-sm text-gray-500 mb-1">Product Image</label>
               <input
@@ -164,19 +189,21 @@ export default function AdminProducts() {
                 placeholder="Or paste image URL"
                 className="p-2 border rounded w-full text-sm"
               />
+
               {newProduct.image && (
                 <div className="mt-3">
-                  <div className="h-80 w-56 overflow-hidden rounded border bg-gray-100">
+                  <div className={PRODUCT_IMAGE_PREVIEW_FRAME_CLASS}>
                     <img
                       src={newProduct.image}
                       alt="Preview"
                       className="h-full w-full object-cover"
-                      style={getImagePreviewStyle(newProduct)}
+                      style={getProductImageStyle(newProduct)}
                     />
                   </div>
                 </div>
               )}
-              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <label className="text-sm text-gray-600">
                   Zoom: {newProduct.imageScale}%
                   <input
@@ -186,6 +213,18 @@ export default function AdminProducts() {
                     step="5"
                     value={newProduct.imageScale}
                     onChange={(e) => setNewProduct((p) => ({ ...p, imageScale: Number(e.target.value) }))}
+                    className="mt-1 w-full"
+                  />
+                </label>
+                <label className="text-sm text-gray-600">
+                  Horizontal position: {newProduct.imagePositionX}%
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={newProduct.imagePositionX}
+                    onChange={(e) => setNewProduct((p) => ({ ...p, imagePositionX: Number(e.target.value) }))}
                     className="mt-1 w-full"
                   />
                 </label>
@@ -202,17 +241,23 @@ export default function AdminProducts() {
                   />
                 </label>
               </div>
+
+              <button
+                type="button"
+                onClick={() => resetImageControls(setNewProduct)}
+                className="mt-3 border px-3 py-2 rounded text-sm"
+              >
+                Reset image framing
+              </button>
             </div>
+
             <textarea value={newProduct.description} onChange={(e) => setNewProduct((p) => ({ ...p, description: e.target.value }))} placeholder="Description" className="p-2 border rounded col-span-1 md:col-span-2" required />
             <label className="flex items-center gap-2 col-span-1 md:col-span-2">
-              <input
-                type="checkbox"
-                checked={newProduct.featured}
-                onChange={(e) => setNewProduct((p) => ({ ...p, featured: e.target.checked }))}
-              />
+              <input type="checkbox" checked={newProduct.featured} onChange={(e) => setNewProduct((p) => ({ ...p, featured: e.target.checked }))} />
               Featured product
             </label>
           </div>
+
           {error && <p className="text-red-500 mt-2">{error}</p>}
           <button className="mt-4 bg-black text-white px-4 py-2 rounded">Save</button>
         </form>
@@ -228,6 +273,7 @@ export default function AdminProducts() {
                     <input value={editingProduct.slug} onChange={(e) => setEditingProduct((p) => ({ ...p, slug: e.target.value }))} className="p-2 border rounded" placeholder="Slug" />
                     <input value={editingProduct.price} onChange={(e) => setEditingProduct((p) => ({ ...p, price: e.target.value }))} className="p-2 border rounded" type="number" step="0.01" placeholder="Price" />
                     <input value={editingProduct.stock} onChange={(e) => setEditingProduct((p) => ({ ...p, stock: e.target.value }))} className="p-2 border rounded" type="number" placeholder="Stock" />
+
                     <div className="col-span-1 md:col-span-2">
                       <label className="block text-sm text-gray-500 mb-1">Product Image</label>
                       <input
@@ -242,19 +288,21 @@ export default function AdminProducts() {
                         placeholder="Or paste image URL"
                         className="p-2 border rounded w-full text-sm"
                       />
+
                       {editingProduct.image && (
                         <div className="mt-3">
-                          <div className="h-80 w-56 overflow-hidden rounded border bg-gray-100">
+                          <div className={PRODUCT_IMAGE_PREVIEW_FRAME_CLASS}>
                             <img
                               src={editingProduct.image}
                               alt="Preview"
                               className="h-full w-full object-cover"
-                              style={getImagePreviewStyle(editingProduct)}
+                              style={getProductImageStyle(editingProduct)}
                             />
                           </div>
                         </div>
                       )}
-                      <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                      <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <label className="text-sm text-gray-600">
                           Zoom: {editingProduct.imageScale}%
                           <input
@@ -264,6 +312,18 @@ export default function AdminProducts() {
                             step="5"
                             value={editingProduct.imageScale}
                             onChange={(e) => setEditingProduct((p) => ({ ...p, imageScale: Number(e.target.value) }))}
+                            className="mt-1 w-full"
+                          />
+                        </label>
+                        <label className="text-sm text-gray-600">
+                          Horizontal position: {editingProduct.imagePositionX}%
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            step="1"
+                            value={editingProduct.imagePositionX}
+                            onChange={(e) => setEditingProduct((p) => ({ ...p, imagePositionX: Number(e.target.value) }))}
                             className="mt-1 w-full"
                           />
                         </label>
@@ -280,16 +340,22 @@ export default function AdminProducts() {
                           />
                         </label>
                       </div>
+
+                      <button
+                        type="button"
+                        onClick={() => resetImageControls(setEditingProduct)}
+                        className="mt-3 border px-3 py-2 rounded text-sm"
+                      >
+                        Reset image framing
+                      </button>
                     </div>
+
                     <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={editingProduct.featured}
-                        onChange={(e) => setEditingProduct((p) => ({ ...p, featured: e.target.checked }))}
-                      />
+                      <input type="checkbox" checked={editingProduct.featured} onChange={(e) => setEditingProduct((p) => ({ ...p, featured: e.target.checked }))} />
                       Featured product
                     </label>
                     <textarea value={editingProduct.description} onChange={(e) => setEditingProduct((p) => ({ ...p, description: e.target.value }))} className="p-2 border rounded col-span-1 md:col-span-2" placeholder="Description" />
+
                     <div className="col-span-1 md:col-span-2 flex gap-2">
                       <button onClick={() => saveEdit(item.id)} className="bg-black text-white px-3 py-1 rounded">Save Changes</button>
                       <button onClick={cancelEdit} className="bg-gray-400 text-white px-3 py-1 rounded">Cancel</button>
@@ -304,7 +370,7 @@ export default function AdminProducts() {
                             src={item.image}
                             alt={item.title}
                             className="h-full w-full object-cover"
-                            style={getImagePreviewStyle(item)}
+                            style={getProductImageStyle(item)}
                           />
                         </div>
                       ) : (
@@ -312,6 +378,7 @@ export default function AdminProducts() {
                           <span className="text-xs text-gray-400">No image</span>
                         </div>
                       )}
+
                       <div>
                         <p className="font-semibold">
                           {item.title} {item.featured ? <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Featured</span> : null}
@@ -319,6 +386,7 @@ export default function AdminProducts() {
                         <p className="text-sm text-gray-600">${item.price} | Stock: {item.stock}</p>
                       </div>
                     </div>
+
                     <div className="flex gap-2">
                       <button onClick={() => startEdit(item)} className="bg-blue-500 text-white px-3 py-1 rounded">Edit</button>
                       <button onClick={() => deleteProduct(item.id)} className="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
