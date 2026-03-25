@@ -22,9 +22,6 @@ export default function Header() {
           <Link href="/about" className="hover:text-gray-300">
             About
           </Link>
-          <Link href="/contact" className="hover:text-gray-300">
-            Contact
-          </Link>
         </nav>
         <div className="flex items-center space-x-4">
           <Link href="/cart" className="relative hover:text-gray-300 flex items-center gap-1">
