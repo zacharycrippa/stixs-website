@@ -114,15 +114,14 @@ export default function Admin() {
               View Analytics
             </button>
           </div>
-        </div>
 
-        <div className="mt-8 bg-white p-6 rounded shadow">
-          <h2 className="text-2xl font-semibold mb-4">Recent Activity</h2>
-          <ul className="space-y-2">
-            <li>New order received for Caravan Scoop</li>
-            <li>Custom print request submitted</li>
-            <li>Product Phone Stand updated</li>
-          </ul>
+          <div className="bg-white p-6 rounded shadow">
+            <h2 className="text-2xl font-semibold mb-4">Enquiries</h2>
+            <p className="text-gray-600 mb-4">Read and reply to customer contact form submissions.</p>
+            <button onClick={() => router.push('/admin/enquiries')} className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">
+              View Enquiries
+            </button>
+          </div>
         </div>
       </div>
     </main>

@@ -7,12 +7,12 @@ export default function Header() {
   const { getCartCount } = useCart()
 
   return (
-    <header className="bg-black text-white p-4">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+    <header className="bg-black text-white py-4 px-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-3 items-center">
         <Link href="/" className="text-2xl font-bold">
           Stixs 3D
         </Link>
-        <nav className="flex space-x-6">
+        <nav className="flex justify-center space-x-6">
           <Link href="/" className="hover:text-gray-300">
             Home
           </Link>
@@ -23,7 +23,7 @@ export default function Header() {
             About
           </Link>
         </nav>
-        <div className="flex items-center space-x-4">
+        <div className="flex justify-end items-center">
           <Link href="/cart" className="relative hover:text-gray-300 flex items-center gap-1">
             Cart
             {getCartCount() > 0 && (
