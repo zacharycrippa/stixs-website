@@ -110,7 +110,7 @@ export default function Admin() {
           <div className="bg-white p-6 rounded shadow">
             <h2 className="text-2xl font-semibold mb-4">Analytics</h2>
             <p className="text-gray-600 mb-4">View sales data and website statistics.</p>
-            <button className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">
+            <button onClick={() => router.push('/admin/analytics')} className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">
               View Analytics
             </button>
           </div>
