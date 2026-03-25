@@ -100,14 +100,30 @@ export default function AdminProducts() {
   }
 
   const uploadImage = async (file, updateFn) => {
-    const res = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+    setError('')
+
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const res = await fetch('/api/upload', {
       method: 'POST',
-      body: file,
+      body: formData,
     })
-    if (res.ok) {
-      const data = await res.json()
-      updateFn(data.url)
+
+    if (!res.ok) {
+      let message = 'Failed to upload image'
+      try {
+        const data = await res.json()
+        if (data?.error) message = data.error
+      } catch {
+        // Ignore JSON parse errors and show generic message.
+      }
+      setError(message)
+      return
     }
+
+    const data = await res.json()
+    updateFn(data.url)
   }
 
   return (
